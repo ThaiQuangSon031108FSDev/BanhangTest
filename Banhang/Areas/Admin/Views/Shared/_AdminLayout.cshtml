@@ -1,8 +1,10 @@
+@using System.Security.Claims
 @{
     Layout = null;
-    var username = Context.Session.GetString("Username");
-    var roleId = Context.Session.GetInt32("RoleID");
-    var isAdmin = roleId == 1;
+    var username = Context.User.Identity?.Name;
+    var roleName = Context.User.FindFirstValue(ClaimTypes.Role);
+    var isAdmin = string.Equals(roleName, "Admin", StringComparison.OrdinalIgnoreCase);
+    var isEmployee = string.Equals(roleName, "Employee", StringComparison.OrdinalIgnoreCase);
 }
 <!DOCTYPE html>
 <html lang="vi">
@@ -11,6 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@ViewData["Title"] - Admin Panel</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" />
     <link rel="stylesheet" href="~/css/loading.css" />
     <style>
         .sidebar {
@@ -42,7 +45,7 @@
                     {
                         <span class="badge bg-danger">Admin</span>
                     }
-                    else
+                    else if (isEmployee)
                     {
                         <span class="badge bg-info">Employee</span>
                     }
@@ -71,7 +74,25 @@
                                 📦 Sản phẩm
                             </a>
                         </li>
-                        @if(isAdmin)
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Order" ? "active" : "")"
+                               asp-area="Admin" asp-controller="Order" asp-action="Index">
+                                📋 Đơn hàng
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Category" ? "active" : "")"
+                               asp-area="Admin" asp-controller="Category" asp-action="Index">
+                                🗂️ Danh mục
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Customer" ? "active" : "")"
+                               asp-area="Admin" asp-controller="Customer" asp-action="Index">
+                                👥 Khách hàng
+                            </a>
+                        </li>
+                        @if (isAdmin)
                         {
                             <li class="nav-item">
                                 <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Employee" ? "active" : "")"
@@ -81,18 +102,9 @@
                             </li>
                         }
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                📋 Đơn hàng <span class="badge bg-danger">Soon</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                👥 Khách hàng <span class="badge bg-danger">Soon</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                📊 Báo cáo <span class="badge bg-danger">Soon</span>
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Report" ? "active" : "")"
+                               asp-area="Admin" asp-controller="Report" asp-action="Index">
+                                📊 Báo cáo
                             </a>
                         </li>
                         <hr class="text-white">
@@ -118,17 +130,49 @@
         <div class="spinner"></div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="~/js/session-warning.js"></script>
     <script>
-        // Show loading khi submit form
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', function() {
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('form[data-loading="true"]').forEach(form => {
+                form.addEventListener('submit', function () {
                     const overlay = document.getElementById('loadingOverlay');
                     if (overlay) {
                         overlay.classList.add('show');
                     }
+                });
+            });
+
+            document.querySelectorAll('form[data-confirm]').forEach(form => {
+                form.addEventListener('submit', function (evt) {
+                    if (form.dataset.confirmHandled === 'true') {
+                        return;
+                    }
+
+                    evt.preventDefault();
+                    const message = form.dataset.confirm ?? 'Bạn có chắc chắn?';
+                    Swal.fire({
+                        title: 'Xác nhận',
+                        text: message,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Đồng ý',
+                        cancelButtonText: 'Hủy',
+                        customClass: {
+                            confirmButton: 'btn btn-danger me-2',
+                            cancelButton: 'btn btn-outline-secondary'
+                        },
+                        buttonsStyling: false
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            form.dataset.confirmHandled = 'true';
+                            form.submit();
+                        }
+                    });
                 });
             });
         });

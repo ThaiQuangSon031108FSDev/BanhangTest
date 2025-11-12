@@ -1,0 +1,99 @@
+@using System.Linq
+@model Banhang.Models.ViewModels.ReportDashboardViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Báo cáo doanh thu";
+
+    var labels = Model.MonthlyRevenue.Select(m => m.Month.ToString("MM/yyyy")).ToList();
+    var revenueData = Model.MonthlyRevenue.Select(m => m.Total).ToList();
+}
+
+<partial name="_Breadcrumb" />
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Doanh thu 6 tháng gần nhất</h5>
+                </div>
+                <canvas id="revenueChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">Sản phẩm bán chạy</h5>
+                @if (!Model.TopProducts.Any())
+                {
+                    <div class="alert alert-info">Chưa có dữ liệu đơn hàng.</div>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var item in Model.TopProducts)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-semibold">@item.ProductName</div>
+                                    <small class="text-muted">@item.Quantity sản phẩm</small>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">@item.Revenue.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const revenueCtx = document.getElementById('revenueChart');
+            if (revenueCtx) {
+                const chart = new Chart(revenueCtx, {
+                    type: 'line',
+                    data: {
+                        labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(labels)),
+                        datasets: [{
+                            label: 'Doanh thu (VND)',
+                            data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(revenueData)),
+                            borderColor: '#f093fb',
+                            backgroundColor: 'rgba(240, 147, 251, 0.2)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#f5576c'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                ticks: {
+                                    callback: function (value) {
+                                        return new Intl.NumberFormat('vi-VN').format(value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}

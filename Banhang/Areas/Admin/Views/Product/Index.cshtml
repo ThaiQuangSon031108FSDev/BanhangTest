@@ -38,7 +38,7 @@
                 <td>@p.Stock</td>
                 <td class="text-end">
                     <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@p.ProductID">Sửa</a>
-                    <form class="d-inline confirm-delete" method="post" asp-action="Delete" asp-route-id="@p.ProductID">
+                    <form class="d-inline" method="post" asp-action="Delete" asp-route-id="@p.ProductID" data-confirm="Bạn có chắc chắn muốn xóa sản phẩm này?" data-loading="true">
                         @Html.AntiForgeryToken()
                         <button class="btn btn-sm btn-danger" type="submit">Xóa</button>
                     </form>
@@ -69,20 +69,17 @@
 </nav>
 
 @section Scripts {
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
-    <script src="~/js/admin.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script>
-        $(document).ready(function() {
-            $('#productTable').DataTable({
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/vi.json'
-                },
-                pageLength: 10,
-                order: [[0, 'desc']]
-            });
+        document.addEventListener('DOMContentLoaded', function () {
+            if (window.jQuery && jQuery.fn.DataTable) {
+                jQuery('#productTable').DataTable({
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/vi.json'
+                    },
+                    pageLength: 10,
+                    order: [[0, 'desc']]
+                });
+            }
         });
     </script>
 }

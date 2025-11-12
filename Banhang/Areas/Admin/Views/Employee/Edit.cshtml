@@ -1,0 +1,51 @@
+@model Banhang.Models.User
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Cập nhật nhân viên";
+    var isAdmin = (bool?)(ViewBag.IsAdmin) ?? false;
+}
+
+<partial name="_Breadcrumb" />
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title mb-3">Chỉnh sửa nhân viên</h5>
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger">@ViewBag.Error</div>
+        }
+        <form method="post" data-loading="true">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="UserID" />
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Username</label>
+                    <input class="form-control" asp-for="Username" readonly />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Quyền</label>
+                    <select class="form-select" name="isAdmin">
+                        <option value="false" @(isAdmin ? "" : "selected")>Employee</option>
+                        <option value="true" @(isAdmin ? "selected" : "")>Admin</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" asp-for="Email"></label>
+                    <input class="form-control" asp-for="Email" type="email" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" asp-for="FullName"></label>
+                    <input class="form-control" asp-for="FullName" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" asp-for="Phone"></label>
+                    <input class="form-control" asp-for="Phone" />
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button class="btn btn-primary" type="submit">Lưu thay đổi</button>
+                <a class="btn btn-outline-secondary" asp-action="Index">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,21 @@
+@model Banhang.Models.Category
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Thêm danh mục";
+}
+
+<partial name="_Breadcrumb" />
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title mb-3">Thêm danh mục mới</h5>
+        <form method="post" data-loading="true">
+            @Html.AntiForgeryToken()
+            <partial name="_CategoryForm" />
+            <div class="mt-4 d-flex gap-2">
+                <button class="btn btn-primary" type="submit">Lưu</button>
+                <a class="btn btn-outline-secondary" asp-action="Index">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,48 +1,106 @@
-﻿@model List<Banhang.Models.CartItem>
+@model List<Banhang.Models.CartItem>
 @{
     ViewData["Title"] = "Giỏ hàng";
     decimal total = ViewBag.Total ?? 0m;
 }
-<h3>Giỏ hàng</h3>
-@if (Model == null || Model.Count == 0)
+
+@await Html.PartialAsync("_PremiumHero", new PremiumHeroViewModel
 {
-    <div class="alert alert-info">Giỏ hàng trống.</div>
-}
-else
-{
-    <table class="table align-middle">
-        <thead>
-            <tr><th>SP</th><th>Tên</th><th>Giá</th><th>Số lượng</th><th>Tạm tính</th><th></th></tr>
-        </thead>
-        <tbody>
-            @foreach (var i in Model)
-            {
-                <tr>
-                    <td style="width:80px">
-                        <img src="@(string.IsNullOrEmpty(i.ImageUrl) ? "/images/noimg.png" : i.ImageUrl)" class="img-thumbnail" />
-                    </td>
-                    <td>@i.ProductName</td>
-                    <td>@i.Price.ToString("#,0") đ</td>
-                    <td style="width:140px">
-                        <form class="d-flex" method="post" asp-action="Update">
-                            <input type="hidden" name="productId" value="@i.ProductID" />
-                            <input class="form-control me-2" type="number" name="quantity" value="@i.Quantity" min="1" />
-                            <button class="btn btn-sm btn-outline-primary">OK</button>
-                        </form>
-                    </td>
-                    <td>@i.Subtotal.ToString("#,0") đ</td>
-                    <td class="text-end">
-                        <form method="post" asp-action="Remove">
-                            <input type="hidden" name="productId" value="@i.ProductID" />
-                            <button class="btn btn-sm btn-danger" onclick="return confirm('Xóa khỏi giỏ?')">Xóa</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <div class="text-end">
-        <h4>Tổng: <span class="text-danger">@total.ToString("#,0") đ</span></h4>
-        <a class="btn btn-success disabled">Đặt hàng (demo)</a>
+    Eyebrow = "Kiểm tra đơn hàng",
+    Title = "Giỏ hàng của bạn 🛒",
+    Subtitle = "Kiểm tra lại sản phẩm trước khi tiến hành thanh toán."
+})
+
+<section class="py-5">
+    <div class="container">
+        @if (Model == null || Model.Count == 0)
+        {
+            <div class="glass-card p-5 text-center">
+                <h2 class="text-gradient mb-3">Giỏ hàng trống!</h2>
+                <p class="text-white-50">Khám phá thêm sản phẩm hấp dẫn tại trang chủ.</p>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-gradient btn-lg mt-3">Tiếp tục mua sắm</a>
+            </div>
+        }
+        else
+        {
+            <div class="glass-card p-4 mb-4">
+                <div class="table-responsive">
+                    <table class="table align-middle text-white mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th></th>
+                                <th>Sản phẩm</th>
+                                <th>Đơn giá</th>
+                                <th>Số lượng</th>
+                                <th>Tạm tính</th>
+                                <th class="text-end">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td style="width:90px">
+                                        <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "https://via.placeholder.com/120" : item.ImageUrl)" class="rounded" style="width:80px; height:80px; object-fit:cover;" alt="@item.ProductName" />
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold">@item.ProductName</div>
+                                        <small class="text-white-50">Mã SP: @item.ProductID</small>
+                                    </td>
+                                    <td>@item.Price.ToString("#,0") đ</td>
+                                    <td style="width:160px">
+                                        <form class="d-flex" method="post" asp-action="Update" data-loading="true">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="productId" value="@item.ProductID" />
+                                            <input class="form-control me-2" type="number" name="quantity" value="@item.Quantity" min="1" />
+                                            <button class="btn btn-sm btn-gradient" type="submit">Cập nhật</button>
+                                        </form>
+                                    </td>
+                                    <td class="fw-semibold text-gradient">@item.Subtotal.ToString("#,0") đ</td>
+                                    <td class="text-end">
+                                        <form method="post" asp-action="Remove" class="d-inline" data-confirm="Xóa sản phẩm này khỏi giỏ hàng?" data-loading="true">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="productId" value="@item.ProductID" />
+                                            <button class="btn btn-sm btn-outline-danger" type="submit">Xóa</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="glass-card p-4 h-100">
+                        <h3 class="h5 text-gradient mb-3">Ưu đãi dành cho bạn</h3>
+                        <ul class="text-white-50 mb-0">
+                            <li>🚚 Miễn phí giao hàng cho đơn từ 500.000đ</li>
+                            <li>💳 Thanh toán an toàn với nhiều phương thức</li>
+                            <li>🎁 Hoàn tiền 5% cho thành viên thân thiết</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="glass-card p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-white-50">Tạm tính</span>
+                            <span>@total.ToString("#,0") đ</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-white-50">Phí vận chuyển</span>
+                            <span>0 đ</span>
+                        </div>
+                        <hr class="border-secondary" />
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Tổng cộng</span>
+                            <span class="display-6 text-gradient">@total.ToString("#,0") đ</span>
+                        </div>
+                        <a asp-controller="Order" asp-action="Checkout" class="btn btn-gradient btn-lg w-100 mt-4">Thanh toán ngay</a>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
-}
+</section>

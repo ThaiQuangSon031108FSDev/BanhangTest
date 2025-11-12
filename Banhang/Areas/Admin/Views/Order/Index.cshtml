@@ -1,0 +1,170 @@
+@model Banhang.Models.ViewModels.AdminOrderListViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Quản lý đơn hàng";
+}
+
+<partial name="_Breadcrumb" />
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-lg-2">
+        <div class="summary-card bg-primary text-white">
+            <div class="summary-title">Tổng đơn</div>
+            <div class="summary-value">@Model.TotalOrders</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-lg-2">
+        <div class="summary-card bg-warning text-dark">
+            <div class="summary-title">Chờ xử lý</div>
+            <div class="summary-value">@Model.PendingCount</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-lg-2">
+        <div class="summary-card bg-info text-white">
+            <div class="summary-title">Đang xử lý</div>
+            <div class="summary-value">@Model.ProcessingCount</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-lg-2">
+        <div class="summary-card bg-info text-white">
+            <div class="summary-title">Đang giao</div>
+            <div class="summary-value">@Model.ShippedCount</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-lg-2">
+        <div class="summary-card bg-success text-white">
+            <div class="summary-title">Đã giao</div>
+            <div class="summary-value">@Model.DeliveredCount</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-lg-2">
+        <div class="summary-card bg-danger text-white">
+            <div class="summary-title">Đã hủy</div>
+            <div class="summary-value">@Model.CancelledCount</div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow border-0">
+    <div class="card-body">
+        <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center mb-4 gap-3">
+            <div>
+                <h4 class="mb-1">Danh sách đơn hàng</h4>
+                <p class="text-muted mb-0">Theo dõi và xử lý đơn hàng theo thời gian thực.</p>
+            </div>
+            <div class="text-muted">
+                Doanh thu lũy kế: <strong class="text-gradient">@Model.TotalRevenue.ToString("#,0")đ</strong>
+            </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mb-4" role="group" aria-label="Lọc trạng thái đơn hàng">
+            <button type="button" class="btn btn-outline-secondary filter-pill active" data-status="">Tất cả</button>
+            <button type="button" class="btn btn-outline-warning filter-pill" data-status="Pending">Chờ xử lý</button>
+            <button type="button" class="btn btn-outline-info filter-pill" data-status="Processing">Đang xử lý</button>
+            <button type="button" class="btn btn-outline-primary filter-pill" data-status="Shipped">Đang giao</button>
+            <button type="button" class="btn btn-outline-success filter-pill" data-status="Delivered">Đã giao</button>
+            <button type="button" class="btn btn-outline-danger filter-pill" data-status="Cancelled">Đã hủy</button>
+        </div>
+
+        <table class="table table-striped align-middle" id="orderTable">
+            <thead>
+                <tr>
+                    <th>Mã</th>
+                    <th>Khách hàng</th>
+                    <th>Ngày đặt</th>
+                    <th>Trạng thái</th>
+                    <th>Tổng tiền</th>
+                    <th>Ghi chú</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.Orders)
+                {
+                    <tr>
+                        <td class="fw-semibold">#@order.OrderID</td>
+                        <td>
+                            <div class="fw-semibold">@order.ShipName</div>
+                            <small class="text-muted d-block">@order.Email</small>
+                            <small class="text-muted">@(!string.IsNullOrWhiteSpace(order.ShipPhone) ? order.ShipPhone : "Chưa cung cấp")</small>
+                        </td>
+                        <td>
+                            <div>@order.OrderDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
+                            <small class="text-muted">@order.ShipAddress</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-@GetStatusClass(order.Status) px-3 py-2">@order.Status</span>
+                        </td>
+                        <td class="fw-semibold">@order.TotalAmount.ToString("#,0")đ</td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(order.Notes))
+                            {
+                                <span class="badge rounded-pill text-bg-light">@order.Notes</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Không</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-gradient" asp-action="Details" asp-route-id="@order.OrderID">Chi tiết</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@functions {
+    private string GetStatusClass(string status) => status switch
+    {
+        "Pending" => "warning",
+        "Processing" => "info",
+        "Shipped" => "primary",
+        "Delivered" => "success",
+        "Cancelled" => "danger",
+        _ => "secondary"
+    };
+}
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            const table = $('#orderTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/vi.json'
+                },
+                order: [[0, 'desc']],
+                columnDefs: [
+                    { targets: [6], orderable: false, searchable: false }
+                ]
+            });
+
+            $('.filter-pill').on('click', function () {
+                const status = $(this).data('status');
+                $('.filter-pill').removeClass('active');
+                $(this).addClass('active');
+
+                if (status) {
+                    table.column(3).search('^' + status + '$', true, false).draw();
+                } else {
+                    table.column(3).search('').draw();
+                }
+            });
+        });
+    </script>
+}

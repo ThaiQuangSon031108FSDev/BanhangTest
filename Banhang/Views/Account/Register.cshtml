@@ -1,38 +1,74 @@
-﻿@model Banhang.Models.User
+@model Banhang.Models.User
 @{
     ViewData["Title"] = "Đăng ký";
 }
-<h3>Đăng ký</h3>
 
-@if (ViewBag.Error != null)
+@await Html.PartialAsync("_PremiumHero", new PremiumHeroViewModel
 {
-    <div class="alert alert-danger">@ViewBag.Error</div>
-}
+    Eyebrow = "Trải nghiệm Ultra Premium",
+    Title = "Tạo tài khoản mới 🌟",
+    Subtitle = "Gia nhập cộng đồng mua sắm Ultra Premium ngay hôm nay."
+})
 
-<form asp-action="Register" method="post">
-    @Html.AntiForgeryToken()
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <label class="form-label">Username</label>
-            <input class="form-control" name="Username" required />
-        </div>
-        <div class="col-md-6 mb-3">
-            <label class="form-label">Mật khẩu</label>
-            <input class="form-control" type="password" name="password" required />
-        </div>
-        <div class="col-md-6 mb-3">
-            <label class="form-label">Họ tên</label>
-            <input class="form-control" name="FullName" required />
-        </div>
-        <div class="col-md-6 mb-3">
-            <label class="form-label">Email</label>
-            <input class="form-control" name="Email" type="email" required />
-        </div>
-        <div class="col-md-6 mb-3">
-            <label class="form-label">Điện thoại</label>
-            <input class="form-control" name="Phone" />
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="glass-card p-4">
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
+                    <form asp-action="Register" method="post" class="needs-validation" novalidate data-loading="true">
+                        @Html.AntiForgeryToken()
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label text-white">Tên đăng nhập</label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text">👤</span>
+                                    <input class="form-control" name="Username" placeholder="Ví dụ: ultrashop" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-white">Mật khẩu</label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text">🔐</span>
+                                    <input class="form-control" type="password" name="password" placeholder="Ít nhất 6 ký tự" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-white">Họ và tên</label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text">🪪</span>
+                                    <input class="form-control" name="FullName" placeholder="Nguyễn Văn A" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-white">Email</label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text">📧</span>
+                                    <input class="form-control" name="Email" type="email" placeholder="ban@example.com" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-white">Số điện thoại</label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text">📞</span>
+                                    <input class="form-control" name="Phone" placeholder="0912 345 678" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <a asp-action="Login" class="btn btn-outline-primary">Đã có tài khoản?</a>
+                            <button class="btn btn-gradient px-4" type="submit">Đăng ký ngay</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
-    <button class="btn btn-success">Tạo tài khoản</button>
-</form>
-    
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
