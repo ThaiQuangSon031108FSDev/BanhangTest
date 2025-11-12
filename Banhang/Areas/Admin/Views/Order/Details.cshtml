@@ -68,7 +68,7 @@
                         <select name="status" class="form-select">
                             @foreach (var status in statuses)
                             {
-                                <option value="@status" selected="@(status == Model.Status)">@status</option>
+                                <option value="@status" @(status == Model.Status ? "selected" : null)>@status</option>
                             }
                         </select>
                     </div>
