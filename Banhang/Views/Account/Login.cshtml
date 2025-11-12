@@ -3,15 +3,12 @@
     var remembered = Context.Request.Cookies["remember_username"];
 }
 
-<div class="page-hero gradient-bg py-5 text-white text-center position-relative overflow-hidden">
-    <div class="floating-shape shape1"></div>
-    <div class="floating-shape shape2"></div>
-    <div class="floating-shape shape3"></div>
-    <div class="container position-relative">
-        <h1 class="display-5 fw-bold mb-2">Chào mừng trở lại! 🔐</h1>
-        <p class="lead mb-0">Đăng nhập để tiếp tục mua sắm với trải nghiệm Ultra Premium.</p>
-    </div>
-</div>
+@await Html.PartialAsync("_PremiumHero", new PremiumHeroViewModel
+{
+    Eyebrow = "Trở lại mua sắm",
+    Title = "Chào mừng trở lại! 🔐",
+    Subtitle = "Đăng nhập để tiếp tục mua sắm với trải nghiệm Ultra Premium."
+})
 
 <section class="py-5">
     <div class="container">

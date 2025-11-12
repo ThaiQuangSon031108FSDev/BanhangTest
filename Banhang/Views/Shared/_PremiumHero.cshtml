@@ -1,0 +1,18 @@
+@model PremiumHeroViewModel
+
+<div class="page-hero gradient-bg py-5 text-white text-center position-relative overflow-hidden premium-hero">
+    <div class="floating-shape shape1"></div>
+    <div class="floating-shape shape2"></div>
+    <div class="floating-shape shape3"></div>
+    <div class="container position-relative">
+        @if (!string.IsNullOrWhiteSpace(Model.Eyebrow))
+        {
+            <span class="hero-eyebrow d-inline-block text-uppercase text-white-50 fw-semibold mb-2">@Model.Eyebrow</span>
+        }
+        <h1 class="display-5 fw-bold mb-2">@Model.Title</h1>
+        @if (!string.IsNullOrWhiteSpace(Model.Subtitle))
+        {
+            <p class="lead mb-0 text-white-75">@Model.Subtitle</p>
+        }
+    </div>
+</div>

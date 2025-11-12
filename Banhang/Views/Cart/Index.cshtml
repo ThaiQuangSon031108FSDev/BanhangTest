@@ -4,15 +4,12 @@
     decimal total = ViewBag.Total ?? 0m;
 }
 
-<div class="page-hero gradient-bg py-5 text-white text-center position-relative overflow-hidden">
-    <div class="floating-shape shape1"></div>
-    <div class="floating-shape shape2"></div>
-    <div class="floating-shape shape3"></div>
-    <div class="container position-relative">
-        <h1 class="display-5 fw-bold mb-2">Giỏ hàng của bạn 🛒</h1>
-        <p class="lead mb-0">Kiểm tra lại sản phẩm trước khi tiến hành thanh toán.</p>
-    </div>
-</div>
+@await Html.PartialAsync("_PremiumHero", new PremiumHeroViewModel
+{
+    Eyebrow = "Kiểm tra đơn hàng",
+    Title = "Giỏ hàng của bạn 🛒",
+    Subtitle = "Kiểm tra lại sản phẩm trước khi tiến hành thanh toán."
+})
 
 <section class="py-5">
     <div class="container">
