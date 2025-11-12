@@ -1,0 +1,62 @@
+@model Banhang.Models.Order
+@{
+    ViewData["Title"] = "Đặt hàng thành công";
+}
+
+<div class="page-hero gradient-bg py-5 text-white text-center position-relative overflow-hidden">
+    <div class="floating-shape shape1"></div>
+    <div class="floating-shape shape2"></div>
+    <div class="floating-shape shape3"></div>
+    <div class="container position-relative">
+        <h1 class="display-5 fw-bold mb-2">Cảm ơn bạn đã đặt hàng! 🎉</h1>
+        <p class="lead mb-0">Mã đơn hàng của bạn là <strong>#@Model.OrderID</strong>. Chúng tôi sẽ liên hệ khi đơn hàng được xử lý.</p>
+    </div>
+</div>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="glass-card p-4 shadow-lg">
+                    <h2 class="h4 mb-3 text-gradient">Thông tin đơn hàng</h2>
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2">📅 <strong>Ngày đặt:</strong> @Model.OrderDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</li>
+                        <li class="mb-2">🚚 <strong>Trạng thái:</strong> <span class="badge bg-gradient text-white">@Model.Status</span></li>
+                        <li class="mb-2">👤 <strong>Người nhận:</strong> @Model.ShipName</li>
+                        <li class="mb-2">📞 <strong>Liên hệ:</strong> @Model.ShipPhone</li>
+                        <li class="mb-2">📍 <strong>Địa chỉ:</strong> @Model.ShipAddress</li>
+                        @if (!string.IsNullOrWhiteSpace(Model.Notes))
+                        {
+                            <li class="mb-2">📝 <strong>Ghi chú:</strong> @Model.Notes</li>
+                        }
+                    </ul>
+
+                    <h3 class="h5 mb-3 text-gradient">Sản phẩm</h3>
+                    <div class="list-group list-group-flush">
+                        @foreach (var item in Model.Items)
+                        {
+                            <div class="list-group-item bg-transparent border-0 d-flex align-items-center gap-3">
+                                <div class="rounded-4 overflow-hidden" style="width: 72px; height: 72px;">
+                                    <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "https://via.placeholder.com/150" : item.ImageUrl)" class="img-fluid h-100 w-100 object-fit-cover" alt="@item.ProductName" />
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold">@item.ProductName</div>
+                                    <small class="text-muted">Số lượng: @item.Quantity</small>
+                                </div>
+                                <div class="fw-bold text-end text-gradient">@item.LineTotal.ToString("#,0")đ</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="glass-card p-4 shadow-lg h-100">
+                    <h2 class="h4 mb-3 text-gradient">Tổng thanh toán</h2>
+                    <div class="display-6 text-gradient">@Model.TotalAmount.ToString("#,0")đ</div>
+                    <p class="text-muted mt-3">Email xác nhận sẽ được gửi tới <strong>@(Model.Email ?? "email của bạn")</strong>. Nếu có thắc mắc, vui lòng liên hệ hotline hỗ trợ 24/7.</p>
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-gradient btn-lg mt-3">Tiếp tục mua sắm</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,9 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Banhang.Controllers
 {
     public class ErrorController : Controller
     {
+        private readonly ILogger<ErrorController> _logger;
+
+        public ErrorController(ILogger<ErrorController> logger)
+        {
+            _logger = logger;
+        }
+
         [Route("Error/{statusCode}")]
         public IActionResult HttpStatusCodeHandler(int statusCode)
         {
@@ -25,12 +33,14 @@ namespace Banhang.Controllers
                     break;
             }
 
+            _logger.LogWarning("Trả về trang lỗi {StatusCode} cho người dùng {Username}", statusCode, User.Identity?.Name);
             return View("Error");
         }
 
         [Route("Error")]
         public IActionResult Error()
         {
+            _logger.LogError("Đã xảy ra lỗi không xác định, chuyển hướng đến trang Error");
             return View();
         }
     }

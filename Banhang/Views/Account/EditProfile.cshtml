@@ -1,0 +1,69 @@
+@model Banhang.Models.ViewModels.EditProfileViewModel
+@{
+    ViewData["Title"] = "Chỉnh sửa hồ sơ";
+}
+
+<div class="page-hero gradient-bg py-5 text-white text-center position-relative overflow-hidden">
+    <div class="floating-shape shape1"></div>
+    <div class="floating-shape shape2"></div>
+    <div class="floating-shape shape3"></div>
+    <div class="container position-relative">
+        <h1 class="display-5 fw-bold mb-2">Cập nhật thông tin ✏️</h1>
+        <p class="lead mb-0">Giữ thông tin của bạn luôn chính xác để nhận thông tin đơn hàng nhanh chóng.</p>
+    </div>
+</div>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="glass-card p-4">
+                    <form asp-action="EditProfile" method="post" class="needs-validation" novalidate data-loading="true">
+                        @Html.AntiForgeryToken()
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label asp-for="Username" class="form-label"></label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text">👤</span>
+                                    <input asp-for="Username" class="form-control" readonly />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="FullName" class="form-label"></label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text">🪪</span>
+                                    <input asp-for="FullName" class="form-control" placeholder="Họ và tên" />
+                                </div>
+                                <span asp-validation-for="FullName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label"></label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text">📧</span>
+                                    <input asp-for="Email" class="form-control" placeholder="Email liên hệ" />
+                                </div>
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Phone" class="form-label"></label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text">📞</span>
+                                    <input asp-for="Phone" class="form-control" placeholder="Số điện thoại" />
+                                </div>
+                                <span asp-validation-for="Phone" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <a asp-action="Profile" class="btn btn-outline-primary">← Quay lại</a>
+                            <button type="submit" class="btn btn-gradient px-4">Lưu thay đổi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

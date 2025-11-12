@@ -1,0 +1,12 @@
+@model Banhang.Models.Category
+<div class="row g-3">
+    <div class="col-md-6">
+        <label class="form-label fw-semibold" asp-for="CategoryName"></label>
+        <input class="form-control" asp-for="CategoryName" required />
+        <span class="text-danger" asp-validation-for="CategoryName"></span>
+    </div>
+    <div class="col-12">
+        <label class="form-label fw-semibold" asp-for="Description"></label>
+        <textarea class="form-control" asp-for="Description" rows="3"></textarea>
+    </div>
+</div>

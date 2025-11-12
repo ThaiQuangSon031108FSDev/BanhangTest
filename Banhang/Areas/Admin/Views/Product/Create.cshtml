@@ -14,7 +14,7 @@
     <div class="alert alert-danger">@ViewBag.Error</div>
 }
 
-<form method="post" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data" data-loading="true">
     @Html.AntiForgeryToken()
     <div class="row">
         <div class="col-md-6 mb-3">

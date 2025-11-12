@@ -9,20 +9,69 @@
     <h4>Nhân viên / Admin</h4>
     <a class="btn btn-success" asp-action="Create">Thêm nhân viên</a>
 </div>
-<table class="table table-striped">
-    <thead>
-        <tr><th>ID</th><th>Username</th><th>Họ tên</th><th>Email</th><th>Role</th></tr>
-    </thead>
-    <tbody>
-        @foreach (var u in Model)
-        {
-            <tr>
-                <td>@u.UserID</td>
-                <td>@u.Username</td>
-                <td>@u.FullName</td>
-                <td>@u.Email</td>
-                <td>@u.RoleName</td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table table-striped" id="employeeTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Họ tên</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model)
+                {
+                    <tr>
+                        <td>@u.UserID</td>
+                        <td>@u.Username</td>
+                        <td>@u.FullName</td>
+                        <td>@u.Email</td>
+                        <td>@u.RoleName</td>
+                        <td>
+                            @if (u.IsActive)
+                            {
+                                <span class="badge bg-success">Hoạt động</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Đã khóa</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@u.UserID">Sửa</a>
+                            @if (u.IsActive)
+                            {
+                                <form class="d-inline" method="post" asp-action="Deactivate" asp-route-id="@u.UserID" data-confirm="Khóa tài khoản nhân viên này?" data-loading="true">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Vô hiệu hóa</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (window.jQuery && jQuery.fn.DataTable) {
+                jQuery('#employeeTable').DataTable({
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/vi.json'
+                    },
+                    columnDefs: [
+                        { orderable: false, targets: -1 }
+                    ]
+                });
+            }
+        });
+    </script>
+}

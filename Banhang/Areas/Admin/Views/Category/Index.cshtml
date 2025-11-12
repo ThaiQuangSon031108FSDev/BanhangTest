@@ -1,0 +1,59 @@
+@model List<Banhang.Models.Category>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Quản lý danh mục";
+}
+
+<partial name="_Breadcrumb" />
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Danh mục sản phẩm</h4>
+    <a class="btn btn-primary" asp-action="Create">Thêm danh mục</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table table-striped align-middle" id="categoriesTable">
+            <thead>
+                <tr>
+                    <th>Mã</th>
+                    <th>Tên danh mục</th>
+                    <th>Mô tả</th>
+                    <th class="text-end">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var category in Model)
+                {
+                    <tr>
+                        <td>@category.CategoryID</td>
+                        <td>@category.CategoryName</td>
+                        <td>@category.Description</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@category.CategoryID">Sửa</a>
+                            <form class="d-inline" asp-action="Delete" asp-route-id="@category.CategoryID" method="post" data-confirm="Bạn có chắc chắn muốn xóa danh mục này?" data-loading="true">
+                                @Html.AntiForgeryToken()
+                                <button class="btn btn-sm btn-outline-danger" type="submit">Xóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const table = document.getElementById('categoriesTable');
+            if (table && window.jQuery && jQuery.fn.DataTable) {
+                jQuery(table).DataTable({
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/vi.json'
+                    }
+                });
+            }
+        });
+    </script>
+}

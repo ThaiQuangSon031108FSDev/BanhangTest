@@ -1,0 +1,117 @@
+@using System.Linq
+@model Banhang.Models.ViewModels.ProfileViewModel
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+}
+
+<div class="page-hero gradient-bg py-5 text-white text-center position-relative overflow-hidden">
+    <div class="floating-shape shape1"></div>
+    <div class="floating-shape shape2"></div>
+    <div class="floating-shape shape3"></div>
+    <div class="container position-relative">
+        <h1 class="display-5 fw-bold mb-2">Xin chào, @Model.FullName 👋</h1>
+        <p class="lead mb-0">Quản lý thông tin tài khoản và bảo mật của bạn tại đây.</p>
+    </div>
+</div>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="glass-card p-4 h-100">
+                    <h2 class="h4 mb-4 text-gradient">Thông tin tài khoản</h2>
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-3">👤 <strong>Tên đăng nhập:</strong> @Model.Username</li>
+                        <li class="mb-3">🪪 <strong>Họ và tên:</strong> @Model.FullName</li>
+                        <li class="mb-3">📧 <strong>Email:</strong> @Model.Email</li>
+                        <li class="mb-3">📞 <strong>Số điện thoại:</strong> @(string.IsNullOrWhiteSpace(Model.Phone) ? "Chưa cập nhật" : Model.Phone)</li>
+                        <li class="mb-3">🎯 <strong>Vai trò:</strong> @Model.RoleName</li>
+                        <li class="mb-0">🕒 <strong>Ngày tham gia:</strong> @Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</li>
+                    </ul>
+                    <div class="d-flex gap-3">
+                        <a asp-action="EditProfile" class="btn btn-gradient">Chỉnh sửa thông tin</a>
+                        <a asp-action="ChangePassword" class="btn btn-outline-primary">Đổi mật khẩu</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="glass-card p-4 h-100">
+                    <h2 class="h4 mb-4 text-gradient">Mẹo bảo mật</h2>
+                    <ul class="text-white-50 mb-0">
+                        <li class="mb-3">✔️ Sử dụng mật khẩu mạnh, kết hợp chữ hoa, chữ thường, số và ký tự đặc biệt.</li>
+                        <li class="mb-3">✔️ Không chia sẻ thông tin đăng nhập với người khác.</li>
+                        <li class="mb-3">✔️ Cập nhật thông tin liên hệ chính xác để nhận thông báo đơn hàng.</li>
+                        <li>✔️ Đăng xuất khỏi tài khoản khi sử dụng trên máy công cộng.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row g-4 mt-1">
+            <div class="col-12">
+                <div class="glass-card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2 class="h4 mb-1 text-gradient">Đơn hàng gần đây</h2>
+                            <p class="text-white-50 mb-0">Theo dõi trạng thái và xem chi tiết các đơn hàng của bạn.</p>
+                        </div>
+                        <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-light">
+                            Tiếp tục mua sắm
+                        </a>
+                    </div>
+
+                    @if (Model.RecentOrders.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table align-middle table-borderless mb-0 text-white">
+                                <thead class="text-uppercase text-white-50 small">
+                                    <tr>
+                                        <th>Mã đơn</th>
+                                        <th>Ngày đặt</th>
+                                        <th>Trạng thái</th>
+                                        <th class="text-end">Tổng tiền</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in Model.RecentOrders)
+                                    {
+                                        var statusClass = order.Status switch
+                                        {
+                                            "Pending" => "badge bg-warning text-dark",
+                                            "Processing" => "badge bg-info text-dark",
+                                            "Shipped" => "badge bg-primary",
+                                            "Delivered" => "badge bg-success",
+                                            "Cancelled" => "badge bg-danger",
+                                            _ => "badge bg-secondary"
+                                        };
+
+                                        <tr class="glass-row">
+                                            <td>#@order.OrderID</td>
+                                            <td>@order.OrderDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td><span class="@statusClass">@order.Status</span></td>
+                                            <td class="text-end fw-semibold">@order.TotalAmount.ToString("N0") ₫</td>
+                                            <td class="text-end">
+                                                <a asp-controller="Order" asp-action="Confirmation" asp-route-id="@order.OrderID" class="btn btn-sm btn-gradient">
+                                                    Xem chi tiết
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-white-50 py-5">
+                            <div class="display-6 mb-3">🛍️</div>
+                            <h3 class="h5 text-white">Bạn chưa có đơn hàng nào</h3>
+                            <p class="mb-4">Bắt đầu mua sắm và đơn hàng của bạn sẽ xuất hiện tại đây.</p>
+                            <a asp-controller="Home" asp-action="Index" class="btn btn-gradient">Khám phá sản phẩm</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

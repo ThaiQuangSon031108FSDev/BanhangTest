@@ -1,28 +1,56 @@
-﻿@{
+@{
     ViewData["Title"] = "Đăng nhập";
-}
-@if (ViewBag.Error != null)
-{
-    <div class="alert alert-danger">@ViewBag.Error</div>
+    var remembered = Context.Request.Cookies["remember_username"];
 }
 
-<form asp-action="Login" method="post">
-    @Html.AntiForgeryToken()
-    <input type="hidden" name="returnUrl" value="@(ViewBag.ReturnUrl ?? "")" />
+<div class="page-hero gradient-bg py-5 text-white text-center position-relative overflow-hidden">
+    <div class="floating-shape shape1"></div>
+    <div class="floating-shape shape2"></div>
+    <div class="floating-shape shape3"></div>
+    <div class="container position-relative">
+        <h1 class="display-5 fw-bold mb-2">Chào mừng trở lại! 🔐</h1>
+        <p class="lead mb-0">Đăng nhập để tiếp tục mua sắm với trải nghiệm Ultra Premium.</p>
+    </div>
+</div>
 
-    <div class="mb-3">
-        <label class="form-label">Username</label>
-        <input class="form-control" name="username" value="@(Context.Request.Cookies["remember_username"])" required />
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <div class="glass-card p-4">
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
+                    <form asp-action="Login" method="post" data-loading="true">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="returnUrl" value="@(ViewBag.ReturnUrl ?? string.Empty)" />
+                        <div class="mb-4">
+                            <label class="form-label text-white">Tên đăng nhập</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text">👤</span>
+                                <input class="form-control" name="username" value="@remembered" placeholder="Nhập tên đăng nhập" required />
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-white">Mật khẩu</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text">🔑</span>
+                                <input class="form-control" type="password" name="password" placeholder="Nhập mật khẩu" required />
+                            </div>
+                        </div>
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" name="remember" id="remember" />
+                            <label class="form-check-label text-white-50" for="remember">Ghi nhớ đăng nhập</label>
+                        </div>
+                        <div class="d-grid gap-3">
+                            <button class="btn btn-gradient btn-lg" type="submit">Đăng nhập</button>
+                            <a class="btn btn-outline-primary btn-lg" asp-action="Register">Tạo tài khoản mới</a>
+                            <a class="text-white-50 text-center" asp-action="ForgotPassword">Quên mật khẩu?</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="mb-3">
-        <label class="form-label">Mật khẩu</label>
-        <input class="form-control" type="password" name="password" required />
-    </div>
-    <div class="form-check mb-3">
-        <input class="form-check-input" type="checkbox" name="remember" id="remember" />
-        <label class="form-check-label" for="remember">Ghi nhớ</label>
-    </div>
-
-    <button class="btn btn-primary">Đăng nhập</button>
-    <a class="btn btn-link" asp-action="Register">Đăng ký</a>
-</form>
+</section>

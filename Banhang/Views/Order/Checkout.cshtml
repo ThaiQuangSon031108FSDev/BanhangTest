@@ -1,0 +1,102 @@
+@model Banhang.Models.ViewModels.CheckoutViewModel
+@{
+    ViewData["Title"] = "Thanh toán";
+}
+
+<div class="page-hero gradient-bg py-5 text-white text-center position-relative overflow-hidden">
+    <div class="floating-shape shape1"></div>
+    <div class="floating-shape shape2"></div>
+    <div class="floating-shape shape3"></div>
+    <div class="container position-relative">
+        <h1 class="display-5 fw-bold mb-2">Hoàn tất đơn hàng ✨</h1>
+        <p class="lead mb-0">Điền thông tin giao hàng của bạn để chúng tôi xử lý đơn nhanh chóng.</p>
+    </div>
+</div>
+
+<section class="checkout-section py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="glass-card p-4 shadow-lg">
+                    <h2 class="h4 mb-4 text-gradient">Thông tin giao hàng</h2>
+                    <form asp-action="PlaceOrder" method="post" class="needs-validation" novalidate data-loading="true">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label asp-for="ShipName" class="form-label"></label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text bg-gradient text-white">👤</span>
+                                    <input asp-for="ShipName" class="form-control" placeholder="Họ và tên người nhận" />
+                                </div>
+                                <span asp-validation-for="ShipName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-12">
+                                <label asp-for="ShipAddress" class="form-label"></label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text bg-gradient text-white">📍</span>
+                                    <input asp-for="ShipAddress" class="form-control" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành" />
+                                </div>
+                                <span asp-validation-for="ShipAddress" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="ShipPhone" class="form-label"></label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text bg-gradient text-white">📞</span>
+                                    <input asp-for="ShipPhone" class="form-control" placeholder="Số điện thoại liên hệ" />
+                                </div>
+                                <span asp-validation-for="ShipPhone" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Notes" class="form-label"></label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text bg-gradient text-white">📝</span>
+                                    <input asp-for="Notes" class="form-control" placeholder="Ghi chú cho đơn hàng (tuỳ chọn)" />
+                                </div>
+                                <span asp-validation-for="Notes" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-primary btn-lg">
+                                ← Quay lại giỏ hàng
+                            </a>
+                            <button type="submit" class="btn btn-gradient btn-lg px-4">
+                                Xác nhận đặt hàng 🚀
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="glass-card p-4 shadow-lg">
+                    <h2 class="h4 mb-4 text-gradient">Tóm tắt đơn hàng</h2>
+                    <div class="list-group list-group-flush">
+                        @foreach (var item in Model.CartItems)
+                        {
+                            <div class="list-group-item bg-transparent border-0 d-flex align-items-center gap-3">
+                                <div class="rounded-4 overflow-hidden" style="width: 72px; height: 72px;">
+                                    <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "https://via.placeholder.com/150" : item.ImageUrl)" class="img-fluid h-100 w-100 object-fit-cover" alt="@item.ProductName" />
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold">@item.ProductName</div>
+                                    <small class="text-muted">Số lượng: @item.Quantity</small>
+                                </div>
+                                <div class="fw-bold text-end text-gradient">@item.Subtotal.ToString("#,0")đ</div>
+                            </div>
+                        }
+                    </div>
+                    <hr />
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-semibold">Tổng cộng</span>
+                        <span class="display-6 text-gradient">@Model.TotalAmount.ToString("#,0")đ</span>
+                    </div>
+                    <p class="text-muted small mt-3">💡 Miễn phí giao hàng cho đơn từ 500.000đ. Đơn hàng sẽ được xử lý trong vòng 24h.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,25 +1,29 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Banhang.Data;
 using Banhang.Models.Admin;
 
 namespace Banhang.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin,Employee")]
     public class DashboardController : AdminBaseController
     {
         private readonly ProductDAO _productDao;
         private readonly UserDAO _userDao;
+        private readonly ILogger<DashboardController> _logger;
 
-        public DashboardController(ProductDAO p, UserDAO u)
+        public DashboardController(ProductDAO p, UserDAO u, ILogger<DashboardController> logger)
         {
             _productDao = p;
             _userDao = u;
+            _logger = logger;
         }
 
         public IActionResult Index()
         {
-            var guard = GuardAdminOrEmployee();   // cho Admin & Employee vào dashboard
-            if (guard is not null) return guard;
+            _logger.LogInformation("User {Username} truy cập dashboard", User.Identity?.Name);
 
             var vm = new DashboardVM
             {

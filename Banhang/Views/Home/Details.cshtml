@@ -1,34 +1,63 @@
-﻿@model Banhang.Models.Product
+@model Banhang.Models.Product
 @{
     ViewData["Title"] = "Chi tiết sản phẩm";
 }
-<div class="row">
-    <div class="col-md-5">
-        <img class="img-fluid rounded" src="@(string.IsNullOrEmpty(Model.ImageUrl)?"/images/noimg.png":Model.ImageUrl)" alt="@Model.ProductName" />
-    </div>
-    <div class="col-md-7">
-        <h3 class="mb-1">@Model.ProductName</h3>
-        <div class="text-muted mb-2">@Model.CategoryName</div>
-        <h4 class="text-danger mb-3">@Model.Price.ToString("#,0") đ</h4>
 
-        @if (!string.IsNullOrEmpty(Model.Color))
-        {
-            <p><strong>Màu:</strong> @Model.Color</p>
-        }
-        @if (!string.IsNullOrEmpty(Model.Size))
-        {
-            <p><strong>Kích cỡ:</strong> @Model.Size</p>
-        }
-        <p><strong>Tồn kho:</strong> @Model.Stock</p>
-
-        <p class="mt-3">@Html.Raw(Model.Description ?? "")</p>
-
-        <form method="post" asp-controller="Cart" asp-action="Add">
-            <input type="hidden" name="productId" value="@Model.ProductID" />
-            <div class="input-group w-auto">
-                <input name="quantity" type="number" value="1" min="1" class="form-control" />
-                <button class="btn btn-success">Thêm vào giỏ</button>
-            </div>
-        </form>
+<div class="page-hero gradient-bg py-5 text-white text-center position-relative overflow-hidden">
+    <div class="floating-shape shape1"></div>
+    <div class="floating-shape shape2"></div>
+    <div class="floating-shape shape3"></div>
+    <div class="container position-relative">
+        <h1 class="display-5 fw-bold mb-2">@Model.ProductName</h1>
+        <p class="lead mb-0">Khám phá thông tin chi tiết và đặt hàng ngay hôm nay.</p>
     </div>
 </div>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4 align-items-start">
+            <div class="col-lg-5">
+                <div class="glass-card p-3 text-center">
+                    <img class="img-fluid rounded" src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "https://via.placeholder.com/500" : Model.ImageUrl)" alt="@Model.ProductName" />
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="glass-card p-4">
+                    <span class="badge bg-gradient mb-3">@Model.CategoryName</span>
+                    <h2 class="text-gradient display-6">@Model.Price.ToString("#,0") đ</h2>
+                    <div class="row mb-4 text-white-50">
+                        @if (!string.IsNullOrEmpty(Model.Color))
+                        {
+                            <div class="col-md-6 mb-2">🎨 <strong>Màu sắc:</strong> <span class="text-white">@Model.Color</span></div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Size))
+                        {
+                            <div class="col-md-6 mb-2">📏 <strong>Kích cỡ:</strong> <span class="text-white">@Model.Size</span></div>
+                        }
+                        <div class="col-md-6 mb-2">📦 <strong>Tồn kho:</strong> <span class="text-white">@Model.Stock</span></div>
+                        <div class="col-md-6 mb-2">⏱️ <strong>Ngày tạo:</strong> <span class="text-white">@Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</span></div>
+                    </div>
+                    <div class="text-white mb-4">
+                        @if (!string.IsNullOrEmpty(Model.Description))
+                        {
+                            @Html.Raw(Model.Description)
+                        }
+                        else
+                        {
+                            <p class="text-white-50">Chưa có mô tả cho sản phẩm này.</p>
+                        }
+                    </div>
+                    <form method="post" asp-controller="Cart" asp-action="Add" class="d-flex gap-3" data-loading="true">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="productId" value="@Model.ProductID" />
+                        <div class="input-group input-group-lg" style="max-width: 180px;">
+                            <span class="input-group-text">🔢</span>
+                            <input name="quantity" type="number" value="1" min="1" class="form-control" />
+                        </div>
+                        <button class="btn btn-gradient btn-lg flex-grow-1" type="submit">Thêm vào giỏ hàng</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

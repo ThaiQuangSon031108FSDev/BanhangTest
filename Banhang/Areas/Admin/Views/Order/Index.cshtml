@@ -1,0 +1,127 @@
+@model Banhang.Models.ViewModels.AdminOrderListViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Quản lý đơn hàng";
+}
+
+<partial name="_Breadcrumb" />
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-lg-2">
+        <div class="summary-card bg-primary text-white">
+            <div class="summary-title">Tổng đơn</div>
+            <div class="summary-value">@Model.TotalOrders</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-lg-2">
+        <div class="summary-card bg-warning text-dark">
+            <div class="summary-title">Chờ xử lý</div>
+            <div class="summary-value">@Model.PendingCount</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-lg-2">
+        <div class="summary-card bg-info text-white">
+            <div class="summary-title">Đang xử lý</div>
+            <div class="summary-value">@Model.ProcessingCount</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-lg-2">
+        <div class="summary-card bg-info text-white">
+            <div class="summary-title">Đang giao</div>
+            <div class="summary-value">@Model.ShippedCount</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-lg-2">
+        <div class="summary-card bg-success text-white">
+            <div class="summary-title">Đã giao</div>
+            <div class="summary-value">@Model.DeliveredCount</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-lg-2">
+        <div class="summary-card bg-danger text-white">
+            <div class="summary-title">Đã hủy</div>
+            <div class="summary-value">@Model.CancelledCount</div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow border-0">
+    <div class="card-body">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-3 gap-2">
+            <h4 class="mb-0">Danh sách đơn hàng</h4>
+            <div class="text-muted">
+                Doanh thu lũy kế: <strong class="text-gradient">@Model.TotalRevenue.ToString("#,0")đ</strong>
+            </div>
+        </div>
+        <table class="table table-striped" id="orderTable">
+            <thead>
+                <tr>
+                    <th>Mã</th>
+                    <th>Khách hàng</th>
+                    <th>Ngày đặt</th>
+                    <th>Trạng thái</th>
+                    <th>Tổng tiền</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.Orders)
+                {
+                    <tr>
+                        <td>#@order.OrderID</td>
+                        <td>
+                            <div class="fw-semibold">@order.ShipName</div>
+                            <small class="text-muted">@order.Email</small>
+                        </td>
+                        <td>@order.OrderDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            <span class="badge bg-@GetStatusClass(order.Status)">@order.Status</span>
+                        </td>
+                        <td>@order.TotalAmount.ToString("#,0")đ</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@order.OrderID">Chi tiết</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@functions {
+    private string GetStatusClass(string status) => status switch
+    {
+        "Pending" => "warning",
+        "Processing" => "info",
+        "Shipped" => "primary",
+        "Delivered" => "success",
+        "Cancelled" => "danger",
+        _ => "secondary"
+    };
+}
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#orderTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/vi.json'
+                },
+                order: [[0, 'desc']]
+            });
+        });
+    </script>
+}

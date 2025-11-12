@@ -6,7 +6,7 @@ namespace Banhang.Helpers
 {
     public static class PasswordHelper
     {
-        public static string HashPassword(string password)
+        private static string HashPasswordLegacy(string password)
         {
             using var sha256 = SHA256.Create();
             var bytes = Encoding.UTF8.GetBytes(password);
@@ -19,10 +19,28 @@ namespace Banhang.Helpers
             return sb.ToString();
         }
 
-        public static bool VerifyPassword(string password, string hash)
+        private static bool IsBcryptHash(string? hash)
+            => !string.IsNullOrEmpty(hash) && hash.StartsWith("$2", StringComparison.Ordinal);
+
+        public static bool IsLegacyHash(string? hash) => !IsBcryptHash(hash);
+
+        public static string HashPassword(string password)
+            => BCrypt.Net.BCrypt.HashPassword(password);
+
+        public static bool VerifyPassword(string password, string? storedHash)
         {
-            var computedHash = HashPassword(password);
-            return string.Equals(computedHash, hash, StringComparison.OrdinalIgnoreCase);
+            if (string.IsNullOrEmpty(storedHash))
+            {
+                return false;
+            }
+
+            if (IsBcryptHash(storedHash))
+            {
+                return BCrypt.Net.BCrypt.Verify(password, storedHash);
+            }
+
+            var legacyHash = HashPasswordLegacy(password);
+            return string.Equals(legacyHash, storedHash, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

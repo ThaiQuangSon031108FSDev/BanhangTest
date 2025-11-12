@@ -1,0 +1,136 @@
+@model Banhang.Models.Order
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = $"Đơn hàng #{Model.OrderID}";
+    var statuses = ViewBag.Statuses as string[] ?? Array.Empty<string>();
+}
+
+<partial name="_Breadcrumb" />
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Thông tin đơn hàng</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Mã đơn</dt>
+                    <dd class="col-sm-8">#@Model.OrderID</dd>
+
+                    <dt class="col-sm-4">Khách hàng</dt>
+                    <dd class="col-sm-8">@Model.ShipName</dd>
+
+                    <dt class="col-sm-4">Liên hệ</dt>
+                    <dd class="col-sm-8">@Model.ShipPhone</dd>
+
+                    <dt class="col-sm-4">Email</dt>
+                    <dd class="col-sm-8">@Model.Email</dd>
+
+                    <dt class="col-sm-4">Địa chỉ</dt>
+                    <dd class="col-sm-8">@Model.ShipAddress</dd>
+
+                    <dt class="col-sm-4">Ngày đặt</dt>
+                    <dd class="col-sm-8">@Model.OrderDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</dd>
+
+                    <dt class="col-sm-4">Trạng thái hiện tại</dt>
+                    <dd class="col-sm-8"><span class="badge bg-@GetStatusClass(Model.Status)">@Model.Status</span></dd>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Notes))
+                    {
+                        <dt class="col-sm-4">Ghi chú</dt>
+                        <dd class="col-sm-8">@Model.Notes</dd>
+                    }
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card shadow border-0">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Cập nhật trạng thái</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="UpdateStatus" method="post" data-loading="true">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.OrderID" />
+                    <div class="mb-3">
+                        <label class="form-label">Chọn trạng thái mới</label>
+                        <select name="status" class="form-select">
+                            @foreach (var status in statuses)
+                            {
+                                <option value="@status" selected="@(status == Model.Status)">@status</option>
+                            }
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Cập nhật</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary ms-2">Quay lại</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow border-0 mt-4">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">Chi tiết sản phẩm</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "https://via.placeholder.com/80" : item.ImageUrl)" class="rounded" style="width: 64px; height: 64px; object-fit: cover;" alt="@item.ProductName" />
+                                    <div>
+                                        <div class="fw-semibold">@item.ProductName</div>
+                                        <small class="text-muted">Mã SP: @item.ProductID</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@item.Quantity</td>
+                            <td>@item.UnitPrice.ToString("#,0")đ</td>
+                            <td>@item.LineTotal.ToString("#,0")đ</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-between">
+        <strong>Tổng cộng</strong>
+        <strong>@Model.TotalAmount.ToString("#,0")đ</strong>
+    </div>
+</div>
+
+@functions {
+    private string GetStatusClass(string status) => status switch
+    {
+        "Pending" => "warning",
+        "Processing" => "info",
+        "Shipped" => "primary",
+        "Delivered" => "success",
+        "Cancelled" => "danger",
+        _ => "secondary"
+    };
+}

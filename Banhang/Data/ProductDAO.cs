@@ -3,13 +3,20 @@ using System.Collections.Generic;
 using System.Data;
 using Banhang.Models;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 
 namespace Banhang.Data
 {
     public class ProductDAO
     {
         private readonly string _connStr;
-        public ProductDAO(string connStr) => _connStr = connStr;
+        private readonly ILogger<ProductDAO> _logger;
+
+        public ProductDAO(string connStr, ILogger<ProductDAO> logger)
+        {
+            _connStr = connStr;
+            _logger = logger;
+        }
 
         public List<Product> GetAllProducts()
         {
@@ -36,6 +43,7 @@ namespace Banhang.Data
             }
             catch (SqlException ex)
             {
+                _logger.LogError(ex, "Lỗi database khi lấy danh sách sản phẩm");
                 throw new Exception("Lỗi database khi lấy danh sách sản phẩm", ex);
             }
         }
@@ -76,6 +84,7 @@ namespace Banhang.Data
             }
             catch (SqlException ex)
             {
+                _logger.LogError(ex, "Lỗi database khi lấy sản phẩm phân trang");
                 throw new Exception("Lỗi database khi lấy sản phẩm phân trang", ex);
             }
         }
@@ -99,6 +108,7 @@ namespace Banhang.Data
             }
             catch (SqlException ex)
             {
+                _logger.LogError(ex, "Lỗi database khi lấy sản phẩm ID {ProductId}", id);
                 throw new Exception($"Lỗi database khi lấy sản phẩm ID {id}", ex);
             }
         }
@@ -128,6 +138,7 @@ namespace Banhang.Data
             }
             catch (SqlException ex)
             {
+                _logger.LogError(ex, "Lỗi database khi tìm kiếm sản phẩm với từ khóa {Keyword}", keyword);
                 throw new Exception("Lỗi database khi tìm kiếm sản phẩm", ex);
             }
         }
@@ -158,6 +169,7 @@ namespace Banhang.Data
             }
             catch (SqlException ex)
             {
+                _logger.LogError(ex, "Lỗi database khi thêm sản phẩm {ProductName}", p.ProductName);
                 throw new Exception("Lỗi database khi thêm sản phẩm", ex);
             }
         }
@@ -189,6 +201,7 @@ namespace Banhang.Data
             }
             catch (SqlException ex)
             {
+                _logger.LogError(ex, "Lỗi database khi cập nhật sản phẩm ID {ProductId}", p.ProductID);
                 throw new Exception($"Lỗi database khi cập nhật sản phẩm ID {p.ProductID}", ex);
             }
         }
@@ -205,6 +218,7 @@ namespace Banhang.Data
             }
             catch (SqlException ex)
             {
+                _logger.LogError(ex, "Lỗi database khi xóa sản phẩm ID {ProductId}", id);
                 throw new Exception($"Lỗi database khi xóa sản phẩm ID {id}", ex);
             }
         }
@@ -220,6 +234,7 @@ namespace Banhang.Data
             }
             catch (SqlException ex)
             {
+                _logger.LogError(ex, "Lỗi database khi đếm sản phẩm");
                 throw new Exception("Lỗi database khi đếm sản phẩm", ex);
             }
         }
@@ -236,6 +251,7 @@ namespace Banhang.Data
             }
             catch (SqlException ex)
             {
+                _logger.LogError(ex, "Lỗi database khi đếm sản phẩm theo danh mục {CategoryId}", categoryId);
                 throw new Exception($"Lỗi database khi đếm sản phẩm theo danh mục {categoryId}", ex);
             }
         }
@@ -258,6 +274,7 @@ namespace Banhang.Data
             }
             catch (SqlException ex)
             {
+                _logger.LogError(ex, "Lỗi database khi tính tổng doanh thu");
                 throw new Exception("Lỗi database khi tính tổng doanh thu", ex);
             }
         }

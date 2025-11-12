@@ -1,28 +1,27 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using Banhang.Data;
 using Banhang.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
-// 1. Namespace phải khớp với vị trí thư mục Area
 namespace Banhang.Areas.Admin.Controllers
 {
-    // 2. Thuộc tính [Area("Admin")] là BẮT BUỘC
-    //    Nó báo cho ASP.NET Core biết controller này thuộc Area "Admin"
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class EmployeeController : AdminBaseController
     {
         private readonly UserDAO _userDao;
+        private readonly ILogger<EmployeeController> _logger;
 
-        // Constructor này đã sửa lỗi CS8618 (cảnh báo null)
-        public EmployeeController(UserDAO userDao)
+        public EmployeeController(UserDAO userDao, ILogger<EmployeeController> logger)
         {
             _userDao = userDao ?? throw new ArgumentNullException(nameof(userDao));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public IActionResult Index()
         {
-            var guard = GuardAdminOnly();
-            if (guard is not null) return guard;
-
             var list = _userDao.GetAllEmployees();
             return View(list);
         }
@@ -30,9 +29,6 @@ namespace Banhang.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            var guard = GuardAdminOnly();
-            if (guard is not null) return guard;
-
             return View(new User());
         }
 
@@ -40,21 +36,99 @@ namespace Banhang.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(User u, string password, bool isAdmin = false)
         {
-            var guard = GuardAdminOnly();
-            if (guard is not null) return guard;
-
-            // 3. Kiểm tra ModelState.IsValid là một thói quen tốt
             if (!ModelState.IsValid)
             {
                 ViewBag.Error = "Dữ liệu không hợp lệ";
                 return View(u);
             }
 
-            var id = _userDao.InsertEmployee(u, password, isAdmin);
-            if (id <= 0)
+            try
             {
-                ViewBag.Error = "Tạo nhân viên thất bại.";
+                var id = _userDao.InsertEmployee(u, password, isAdmin);
+                if (id <= 0)
+                {
+                    ViewBag.Error = "Tạo nhân viên thất bại.";
+                    _logger.LogWarning("Không thể tạo nhân viên mới cho username {Username}", u.Username);
+                    return View(u);
+                }
+
+                _logger.LogInformation("Đã tạo nhân viên mới {Username} với ID {EmployeeId}", u.Username, id);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi tạo nhân viên {Username}", u.Username);
+                ViewBag.Error = "Có lỗi xảy ra khi tạo nhân viên.";
                 return View(u);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var user = _userDao.GetUserByID(id);
+            if (user == null)
+            {
+                TempData["Error"] = "Không tìm thấy nhân viên.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            ViewBag.IsAdmin = string.Equals(user.RoleName, "Admin", StringComparison.OrdinalIgnoreCase);
+            return View(user);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(User u, bool isAdmin = false)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.IsAdmin = isAdmin;
+                ViewBag.Error = "Dữ liệu không hợp lệ.";
+                return View(u);
+            }
+
+            try
+            {
+                if (_userDao.UpdateEmployee(u, isAdmin))
+                {
+                    TempData["SuccessMessage"] = "Đã cập nhật thông tin nhân viên.";
+                }
+                else
+                {
+                    TempData["WarningMessage"] = "Không có thay đổi nào được áp dụng.";
+                }
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi cập nhật nhân viên {UserId}", u.UserID);
+                ViewBag.Error = "Không thể cập nhật nhân viên.";
+                ViewBag.IsAdmin = isAdmin;
+                return View(u);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Deactivate(int id)
+        {
+            try
+            {
+                if (_userDao.SetUserActiveState(id, false))
+                {
+                    TempData["SuccessMessage"] = "Đã vô hiệu hóa tài khoản nhân viên.";
+                }
+                else
+                {
+                    TempData["WarningMessage"] = "Không tìm thấy nhân viên.";
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi vô hiệu hóa nhân viên {UserId}", id);
+                TempData["Error"] = "Không thể vô hiệu hóa nhân viên.";
             }
 
             return RedirectToAction(nameof(Index));
