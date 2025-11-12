@@ -1,0 +1,31 @@
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    var area = ViewContext.RouteData.Values["area"]?.ToString();
+    controller ??= string.Empty;
+    action ??= string.Empty;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-area="@(area ?? string.Empty)" asp-controller="@(area == "Admin" ? "Dashboard" : "Home")" asp-action="Index">
+                🏠 @(area == "Admin" ? "Admin" : "Trang chủ")
+            </a>
+        </li>
+
+        @if (!string.IsNullOrEmpty(controller) && controller != "Dashboard" && controller != "Home")
+        {
+            <li class="breadcrumb-item">
+                <a asp-area="@(area ?? string.Empty)" asp-controller="@controller" asp-action="Index">@controller</a>
+            </li>
+        }
+
+        @if (!string.IsNullOrEmpty(action) && action != "Index")
+        {
+            <li class="breadcrumb-item active" aria-current="page">
+                @(action == "Create" ? "Thêm mới" : action == "Edit" ? "Chỉnh sửa" : action)
+            </li>
+        }
+    </ol>
+</nav>

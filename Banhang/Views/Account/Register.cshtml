@@ -1,0 +1,38 @@
+﻿@model Banhang.Models.User
+@{
+    ViewData["Title"] = "Đăng ký";
+}
+<h3>Đăng ký</h3>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<form asp-action="Register" method="post">
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Username</label>
+            <input class="form-control" name="Username" required />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Mật khẩu</label>
+            <input class="form-control" type="password" name="password" required />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Họ tên</label>
+            <input class="form-control" name="FullName" required />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Email</label>
+            <input class="form-control" name="Email" type="email" required />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Điện thoại</label>
+            <input class="form-control" name="Phone" />
+        </div>
+    </div>
+    <button class="btn btn-success">Tạo tài khoản</button>
+</form>
+    

@@ -1,0 +1,28 @@
+﻿@model List<Banhang.Models.User>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Quản lý nhân viên";
+}
+
+<partial name="_Breadcrumb" />
+<div class="d-flex justify-content-between mb-3">
+    <h4>Nhân viên / Admin</h4>
+    <a class="btn btn-success" asp-action="Create">Thêm nhân viên</a>
+</div>
+<table class="table table-striped">
+    <thead>
+        <tr><th>ID</th><th>Username</th><th>Họ tên</th><th>Email</th><th>Role</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var u in Model)
+        {
+            <tr>
+                <td>@u.UserID</td>
+                <td>@u.Username</td>
+                <td>@u.FullName</td>
+                <td>@u.Email</td>
+                <td>@u.RoleName</td>
+            </tr>
+        }
+    </tbody>
+</table>

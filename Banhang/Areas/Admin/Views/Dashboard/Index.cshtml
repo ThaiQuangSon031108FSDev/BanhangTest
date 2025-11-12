@@ -1,0 +1,134 @@
+@model Banhang.Models.Admin.DashboardVM
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Dashboard - Tổng quan";
+}
+
+<partial name="_Breadcrumb" />
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>📊 Dashboard Admin</h3>
+    <span class="text-muted">@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span>
+</div>
+
+<div class="row g-4">
+    <!-- Card 1: Sản phẩm -->
+    <div class="col-md-3">
+        <div class="card text-white bg-primary h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-white-50 mb-2">Tổng sản phẩm</h6>
+                        <h2 class="mb-0">@Model.TotalProducts</h2>
+                    </div>
+                    <div class="fs-1 opacity-50">📦</div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="/Admin/Product" class="text-white text-decoration-none small">
+                    Xem chi tiết →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 2: Người dùng -->
+    <div class="col-md-3">
+        <div class="card text-white bg-success h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-white-50 mb-2">Tổng người dùng</h6>
+                        <h2 class="mb-0">@Model.TotalUsers</h2>
+                        <small class="text-white-50">
+                            Khách: @Model.TotalCustomers | NV: @Model.TotalEmployees
+                        </small>
+                    </div>
+                    <div class="fs-1 opacity-50">👥</div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="/Admin/Employee" class="text-white text-decoration-none small">
+                    Quản lý →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 3: Nhân viên -->
+    <div class="col-md-3">
+        <div class="card text-white bg-warning h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-white-50 mb-2">Nhân viên / Admin</h6>
+                        <h2 class="mb-0">@Model.TotalEmployees</h2>
+                    </div>
+                    <div class="fs-1 opacity-50">👔</div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="/Admin/Employee" class="text-white text-decoration-none small">
+                    Xem danh sách →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 4: Doanh thu -->
+    <div class="col-md-3">
+        <div class="card text-white bg-danger h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-white-50 mb-2">Tổng doanh thu</h6>
+                        <h2 class="mb-0">@Model.TotalRevenue.ToString("#,0")</h2>
+                        <small class="text-white-50">VNĐ</small>
+                    </div>
+                    <div class="fs-1 opacity-50">💰</div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <span class="text-white-50 small">
+                    Từ đơn đã thanh toán
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Biểu đồ hoặc thống kê bổ sung (tùy chọn) -->
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">📈 Hoạt động gần đây</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Chức năng này sẽ hiển thị lịch sử đơn hàng, sản phẩm mới...</p>
+                <div class="alert alert-info">
+                    <strong>TODO:</strong> Thêm Recent Orders / Recent Products
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">⚠️ Cảnh báo</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <span class="badge bg-warning">Tồn kho thấp</span>
+                        <span class="ms-2 small">Cần nhập thêm hàng</span>
+                    </li>
+                    <li class="mb-2">
+                        <span class="badge bg-danger">Đơn chờ xử lý</span>
+                        <span class="ms-2 small">5 đơn hàng mới</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,48 @@
+﻿@model List<Banhang.Models.CartItem>
+@{
+    ViewData["Title"] = "Giỏ hàng";
+    decimal total = ViewBag.Total ?? 0m;
+}
+<h3>Giỏ hàng</h3>
+@if (Model == null || Model.Count == 0)
+{
+    <div class="alert alert-info">Giỏ hàng trống.</div>
+}
+else
+{
+    <table class="table align-middle">
+        <thead>
+            <tr><th>SP</th><th>Tên</th><th>Giá</th><th>Số lượng</th><th>Tạm tính</th><th></th></tr>
+        </thead>
+        <tbody>
+            @foreach (var i in Model)
+            {
+                <tr>
+                    <td style="width:80px">
+                        <img src="@(string.IsNullOrEmpty(i.ImageUrl) ? "/images/noimg.png" : i.ImageUrl)" class="img-thumbnail" />
+                    </td>
+                    <td>@i.ProductName</td>
+                    <td>@i.Price.ToString("#,0") đ</td>
+                    <td style="width:140px">
+                        <form class="d-flex" method="post" asp-action="Update">
+                            <input type="hidden" name="productId" value="@i.ProductID" />
+                            <input class="form-control me-2" type="number" name="quantity" value="@i.Quantity" min="1" />
+                            <button class="btn btn-sm btn-outline-primary">OK</button>
+                        </form>
+                    </td>
+                    <td>@i.Subtotal.ToString("#,0") đ</td>
+                    <td class="text-end">
+                        <form method="post" asp-action="Remove">
+                            <input type="hidden" name="productId" value="@i.ProductID" />
+                            <button class="btn btn-sm btn-danger" onclick="return confirm('Xóa khỏi giỏ?')">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="text-end">
+        <h4>Tổng: <span class="text-danger">@total.ToString("#,0") đ</span></h4>
+        <a class="btn btn-success disabled">Đặt hàng (demo)</a>
+    </div>
+}

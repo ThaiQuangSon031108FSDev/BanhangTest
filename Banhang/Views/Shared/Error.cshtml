@@ -1,0 +1,18 @@
+@{
+    ViewData["Title"] = "Lỗi";
+    var statusCode = ViewBag.StatusCode ?? 500;
+    var message = ViewBag.ErrorMessage ?? "Đã xảy ra lỗi.";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h1 class="display-1 text-danger">@statusCode</h1>
+            <h3 class="mb-4">Oops! Có lỗi xảy ra</h3>
+            <p class="lead">@message</p>
+            <a class="btn btn-primary" asp-controller="Home" asp-action="Index">
+                Về trang chủ
+            </a>
+        </div>
+    </div>
+</div>

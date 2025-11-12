@@ -1,0 +1,88 @@
+@model Banhang.Models.PaginatedList<Banhang.Models.Product>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Quản lý sản phẩm";
+}
+
+<partial name="_Breadcrumb" />
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Danh sách sản phẩm</h4>
+    <a class="btn btn-success" asp-action="Create">Thêm mới</a>
+</div>
+
+<table class="table table-striped" id="productTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tên</th>
+            <th>Giá</th>
+            <th>Danh mục</th>
+            <th>Tồn</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model.Items)
+        {
+            <tr>
+                <td>@p.ProductID</td>
+                <td>@p.ProductName</td>
+                <td>@p.Price.ToString("#,0")</td>
+                <td>@p.CategoryName</td>
+                <td>@p.Stock</td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@p.ProductID">Sửa</a>
+                    <form class="d-inline confirm-delete" method="post" asp-action="Delete" asp-route-id="@p.ProductID">
+                        @Html.AntiForgeryToken()
+                        <button class="btn btn-sm btn-danger" type="submit">Xóa</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<nav aria-label="Pagination">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+            <a class="page-link" asp-action="Index" asp-route-page="@(Model.PageIndex - 1)">Trước</a>
+        </li>
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+            </li>
+        }
+        <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+            <a class="page-link" asp-action="Index" asp-route-page="@(Model.PageIndex + 1)">Sau</a>
+        </li>
+    </ul>
+    <p class="text-center text-muted">
+        Hiển thị @Model.Items.Count / @Model.TotalCount sản phẩm
+    </p>
+</nav>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+    <script src="~/js/admin.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#productTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/vi.json'
+                },
+                pageLength: 10,
+                order: [[0, 'desc']]
+            });
+        });
+    </script>
+}
