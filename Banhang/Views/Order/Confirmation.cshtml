@@ -8,8 +8,8 @@
     <div class="floating-shape shape2"></div>
     <div class="floating-shape shape3"></div>
     <div class="container position-relative">
-        <h1 class="display-5 fw-bold mb-2">Cảm ơn bạn đã đặt hàng! 🎉</h1>
-        <p class="lead mb-0">Mã đơn hàng của bạn là <strong>#@Model.OrderID</strong>. Chúng tôi sẽ liên hệ khi đơn hàng được xử lý.</p>
+        <h1 class="display-5 fw-bold mb-2">Đặt hàng thành công! 🎉</h1>
+        <p class="lead mb-0">Mã đơn hàng của bạn là <strong>#@Model.OrderID</strong>. Chúng tôi sẽ gửi thông báo khi trạng thái thay đổi.</p>
     </div>
 </div>
 
@@ -54,7 +54,82 @@
                     <h2 class="h4 mb-3 text-gradient">Tổng thanh toán</h2>
                     <div class="display-6 text-gradient">@Model.TotalAmount.ToString("#,0")đ</div>
                     <p class="text-muted mt-3">Email xác nhận sẽ được gửi tới <strong>@(Model.Email ?? "email của bạn")</strong>. Nếu có thắc mắc, vui lòng liên hệ hotline hỗ trợ 24/7.</p>
-                    <a asp-controller="Home" asp-action="Index" class="btn btn-gradient btn-lg mt-3">Tiếp tục mua sắm</a>
+                    <div class="mt-4">
+                        <h3 class="h6 text-uppercase text-muted mb-2">Trạng thái đơn hàng</h3>
+                        @{ 
+                            string[] timelineOrder = { "Pending", "Processing", "Shipped", "Delivered" };
+                            int detectedIndex = Array.IndexOf(timelineOrder, Model.Status ?? string.Empty);
+                            var normalizedStatus = detectedIndex >= 0 ? timelineOrder[detectedIndex] : "Pending";
+                            if (string.Equals(Model.Status, "Cancelled", StringComparison.OrdinalIgnoreCase))
+                            {
+                                normalizedStatus = "Processing";
+                            }
+                            int currentIndex = Array.IndexOf(timelineOrder, normalizedStatus);
+                            Func<string, string> getTimelineClass = stage =>
+                            {
+                                int stageIndex = Array.IndexOf(timelineOrder, stage);
+                                if (string.Equals(Model.Status, "Cancelled", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    if (stage == "Pending")
+                                    {
+                                        return "completed";
+                                    }
+                                    if (stage == "Processing")
+                                    {
+                                        return "current";
+                                    }
+                                    return string.Empty;
+                                }
+
+                                if (currentIndex > stageIndex)
+                                {
+                                    return "completed";
+                                }
+
+                                if (currentIndex == stageIndex)
+                                {
+                                    return "current";
+                                }
+
+                                return string.Empty;
+                            };
+                        }
+                        <ul class="timeline list-unstyled ps-3">
+                            <li class="timeline-item @getTimelineClass("Pending")">Tiếp nhận đơn hàng</li>
+                            <li class="timeline-item @getTimelineClass("Processing")">Đang xử lý</li>
+                            <li class="timeline-item @getTimelineClass("Shipped")">Đang giao</li>
+                            <li class="timeline-item @getTimelineClass("Delivered")">Hoàn tất</li>
+                        </ul>
+                    </div>
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-gradient btn-lg mt-4 w-100">Tiếp tục mua sắm</a>
+                    <a asp-controller="Account" asp-action="Profile" class="btn btn-outline-light btn-lg mt-2 w-100">Xem lịch sử đơn hàng</a>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-lg-8 mx-auto">
+                <div class="glass-card p-4 shadow-sm">
+                    <h3 class="h5 text-gradient mb-3">Bước tiếp theo</h3>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="next-step-card">
+                                <span class="step-number">1</span>
+                                <p class="mb-0">Kiểm tra email xác nhận và đảm bảo thông tin giao hàng chính xác.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="next-step-card">
+                                <span class="step-number">2</span>
+                                <p class="mb-0">Theo dõi tiến trình trong mục <strong>Đơn hàng của tôi</strong> để cập nhật trạng thái mới nhất.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="next-step-card">
+                                <span class="step-number">3</span>
+                                <p class="mb-0">Liên hệ đội ngũ hỗ trợ bất cứ khi nào bạn cần trợ giúp hoặc muốn thay đổi đơn hàng.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
